@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:enabled="true"
+        android:title="Home"
+        android:icon="@drawable/ic_baseline_home_24"
+        />
+
+    <item
+        android:id="@+id/nav_search"
+        android:enabled="true"
+        android:title="Search"
+        android:icon="@drawable/ic_baseline_search_24"/>
+
+    <item
+        android:id="@+id/nav_mic"
+        android:enabled="true"
+        android:title="MIC"
+        android:icon="@drawable/ic_baseline_mic_24"/>
+
+    <item
+        android:id="@+id/nav_favorite"
+        android:enabled="true"
+        android:title="Favorite"
+        android:icon="@drawable/ic_baseline_favorite_24"/>
+
+    <item
+        android:id="@+id/nav_profile"
+        android:enabled="true"
+        android:title="Profile"
+        android:icon="@drawable/ic_baseline_person_24"/>
+</menu>

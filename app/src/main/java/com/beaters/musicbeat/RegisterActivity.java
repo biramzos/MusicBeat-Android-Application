@@ -1,23 +1,22 @@
 package com.beaters.musicbeat;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.beaters.musicbeat.Models.User;
+import com.beaters.musicbeat.Authentication.Database;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.Objects;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -25,19 +24,31 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.BufferedSink;
 
 public class RegisterActivity extends AppCompatActivity {
-    EditText fullName, email, password;
+    EditText username, email, password;
     Button btn_reg, btn_go_log;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        ActivityActions();
+        Database myDB = new Database(RegisterActivity.this);
+        Cursor cursor = myDB.read();
+        if(cursor.getCount() == 0){
+            ActivityActions();
+        }else{
+            while (cursor.moveToNext()) {
+                String email = cursor.getString(1);
+                String password = cursor.getString(2);
+                login(email, password);
+            }
+        }
     }
 
     public void ActivityActions(){
-        fullName = findViewById(R.id.reg_name);
+        username = findViewById(R.id.reg_name);
         email = findViewById(R.id.reg_email);
         password = findViewById(R.id.reg_password);
         btn_reg = findViewById(R.id.btn_reg);
@@ -47,7 +58,7 @@ public class RegisterActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        JSONData(fullName.getText().toString(),email.getText().toString(),password.getText().toString());
+                        register(username.getText().toString(),email.getText().toString(),password.getText().toString());
                     }
                 }
         );
@@ -63,18 +74,34 @@ public class RegisterActivity extends AppCompatActivity {
         );
     }
 
-    public void JSONData(String fullName, String email, String password) {
+    public void register(String username, String email, String password) {
         OkHttpClient client = new OkHttpClient();
-        String url = "https://e23d-85-159-27-200.ngrok.io/api/users/add?fullname="+fullName+"&email="+email+"&password="+password;
+        MediaType type = MediaType.parse("application/json");
+        JSONObject send = new JSONObject();
+        try {
+            send.put("nickname",username);
+            send.put("email",email);
+            send.put("password",password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        RequestBody body = RequestBody.create(type,send.toString());
+        String url = "https://music-beats32.herokuapp.com/auth/signup";
         Request request = new Request.Builder()
                 .url(url)
+                .post(body)
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 e.printStackTrace();
-                Toast toast = Toast.makeText(getApplicationContext(), "Something wrong!", Toast.LENGTH_SHORT);
-                toast.show();
+                RegisterActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast toast = Toast.makeText(getApplicationContext(), "Something wrong!", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                });
             }
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
@@ -82,18 +109,21 @@ public class RegisterActivity extends AppCompatActivity {
                     final String myResponse = Objects.requireNonNull(response.body()).string();
                     try {
                         JSONObject JsonData = new JSONObject(myResponse);
-                        String fullName = JsonData.getString("fullName");
-                        String email = JsonData.getString("email");
-                        String password = JsonData.getString("password");
+                        String message = JsonData.getString("message");
                         RegisterActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Intent data = new Intent(getApplicationContext(),MainActivity.class);
-                                data.putExtra("fullName",fullName);
-                                data.putExtra("email",email);
-                                data.putExtra("password",password);
-                                System.out.println(fullName + " " + email + " " + password);
-                                startActivity(data);
+                                if(message.equals("User registered successfully")){
+                                    Intent data = new Intent(getApplicationContext(),LoginActivity.class);
+                                    startActivity(data);
+                                    Toast.makeText(getApplicationContext(),"Successfully!Please, sign in!", Toast.LENGTH_SHORT).show();
+                                }else if(message.equals("email and nickname already exist")){
+                                    Intent data = new Intent(getApplicationContext(),LoginActivity.class);
+                                    startActivity(data);
+                                    Toast.makeText(getApplicationContext(),"User already exist!", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    Toast.makeText(getApplicationContext(),"Something wrong!", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         });
                     } catch (JSONException e) {
@@ -101,8 +131,102 @@ public class RegisterActivity extends AppCompatActivity {
                         RegisterActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast toast = Toast.makeText(getApplicationContext(),"Something wrong!", Toast.LENGTH_SHORT);
-                                toast.show();
+                                Toast.makeText(getApplicationContext(),"Something wrong!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    public void logout(Long id){
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url("https://music-beats32.herokuapp.com/auth/logout?userId="+id)
+                .delete()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                e.printStackTrace();
+                RegisterActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast toast = Toast.makeText(RegisterActivity.this,"Error!",Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if(response.isSuccessful()){
+                    final String myResponse = Objects.requireNonNull(response.body()).string();
+                    RegisterActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            finishAndRemoveTask();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public void login(String email, String password){
+        OkHttpClient client = new OkHttpClient();
+        MediaType type = MediaType.parse("application/json");
+        JSONObject send = new JSONObject();
+        try {
+            send.put("email",email);
+            send.put("password",password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        RequestBody body = RequestBody.create(type,send.toString());
+        String url = "https://music-beats32.herokuapp.com/auth/signin";
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                System.out.println(e);
+                Toast.makeText(getApplicationContext(),"Something wrong!", Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    final String myResponse = Objects.requireNonNull(response.body()).string();
+                    try {
+                        JSONObject JsonData = new JSONObject(myResponse);
+                        Long id = JsonData.getLong("id");
+                        String emailRes = JsonData.getString("email");
+                        String username = JsonData.getString("nickname");
+                        RegisterActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(emailRes.equals(email)){
+                                    Intent data = new Intent(getApplicationContext(),MainActivity.class);
+                                    data.putExtra("id",id);
+                                    data.putExtra("username",username);
+                                    data.putExtra("email",email);
+                                    data.putExtra("password",password);
+                                    startActivity(data);
+                                }
+                                else{
+                                    Toast.makeText(getApplicationContext(),"Something wrong!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        RegisterActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(),"Something wrong!", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }

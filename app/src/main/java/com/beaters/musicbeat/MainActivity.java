@@ -8,13 +8,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.Objects;
+
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
                     new HomeFragment()).commit();
         }
 
-        if(this.isFinishing() || this.isDestroyed()){
+        if(this.isFinishing()){
             Intent userData = getIntent();
             Long id = userData.getLongExtra("id",0);
             logout(id);
@@ -68,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
                     data.putString("username", userData.getStringExtra("username"));
                     data.putString("email", userData.getStringExtra("email"));
                     data.putLong("id",userData.getLongExtra("id",0));
-                    data.putString("accessToken",userData.getStringExtra("accessToken"));
                     assert selectedFragment != null;
                     selectedFragment.setArguments(data);
                     transaction.replace(R.id.fragment,selectedFragment).addToBackStack(null).commit();
@@ -103,12 +110,30 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             Intent intent = new Intent(getApplicationContext(),RegisterActivity.class);
-                            MainActivity.this.finish();
                             startActivity(intent);
+                            MainActivity.this.finishAndRemoveTask();
                         }
                     });
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        Intent userData = getIntent();
+        Long id = userData.getLongExtra("id",0);
+        logout(id);
+        System.out.println("OnDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
+        Intent userData = getIntent();
+        Long id = userData.getLongExtra("id",0);
+        logout(id);
+        System.out.println("OnStop");
+        super.onStop();
     }
 }

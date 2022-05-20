@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -14,13 +15,17 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.beaters.musicbeat.Models.Track;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -40,8 +45,8 @@ public class TrackByCategoryFragment extends Fragment implements RecyclerViewOnC
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_track_by_category, container, false);
         title = (TextView) view.findViewById(R.id.category_name);
-        recycler = (RecyclerView) view.findViewById(R.id.music_view);
-        back = (Button) view.findViewById(R.id.back_btn_category);
+        recycler = (RecyclerView) view.findViewById(R.id.recycler_view);
+        back = (Button) view.findViewById(R.id.back_btn);
         assert getArguments() != null;
         String name = getArguments().getString("name");
         title.setText(name);
@@ -71,14 +76,15 @@ public class TrackByCategoryFragment extends Fragment implements RecyclerViewOnC
                 requireActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(requireActivity(),"There is no track with  name!",Toast.LENGTH_SHORT).show();
+                        Toast toast = Toast.makeText(requireActivity(),"There is no track with  name!",Toast.LENGTH_SHORT);
+                        toast.show();
                     }
                 });
             }
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if(response.isSuccessful()){
-                    final String res = Objects.requireNonNull(response.body()).string();
+                    String res = Objects.requireNonNull(response.body()).string();
                     try {
                         JSONArray datas = new JSONArray(res);
                         requireActivity().runOnUiThread(new Runnable() {
@@ -96,17 +102,19 @@ public class TrackByCategoryFragment extends Fragment implements RecyclerViewOnC
                                                 data.getString("imageUrl"),
                                                 data.getString("url"));
                                         tracks.add(track);
-                                        TrackByCategoryAdapter adapter = new TrackByCategoryAdapter(getContext(),tracks, onClickListenner,requireActivity());
-                                        recycler.setLayoutManager(new LinearLayoutManager(getContext()));
-                                        recycler.setAdapter(adapter);
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
                                 }
+                                TrackByCategoryAdapter adapter = new TrackByCategoryAdapter(getContext(),tracks, onClickListenner);
+                                recycler.setLayoutManager(new LinearLayoutManager(getContext()));
+                                recycler.setAdapter(adapter);
                             }
                         });
                     } catch (JSONException e) {
-                        Toast.makeText(requireActivity(),"Error!",Toast.LENGTH_SHORT).show();
+                        System.out.println(e);
+                        Toast toast = Toast.makeText(requireActivity(),"Error!",Toast.LENGTH_SHORT);
+                        toast.show();
                     }
                 }
             }

@@ -6,45 +6,44 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/name_track_by_playlist"
-        android:layout_width="224dp"
-        android:layout_height="52dp"
-        android:layout_marginEnd="72dp"
+        android:id="@+id/name_track"
+        android:layout_width="266dp"
+        android:layout_height="57dp"
         android:text="@string/textview"
         android:textColor="#FF5722"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.6"
-        app:layout_constraintStart_toEndOf="@+id/img_track_by_playlist"
+        app:layout_constraintHorizontal_bias="0.937"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.245" />
+        app:layout_constraintVertical_bias="0.208" />
 
     <TextView
-        android:id="@+id/author_track_by_playlist"
-        android:layout_width="223dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="80dp"
+        android:id="@+id/author_track"
+        android:layout_width="266dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="50dp"
         android:text="@string/textview"
         android:textColor="#FF5722"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.722"
-        app:layout_constraintStart_toEndOf="@+id/img_track_by_playlist"
-        app:layout_constraintTop_toBottomOf="@+id/name_track_by_playlist"
-        app:layout_constraintVertical_bias="0.285" />
-
-    <ImageView
-        android:id="@+id/img_track_by_playlist"
-        android:layout_width="70dp"
-        android:layout_height="76dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.015"
+        app:layout_constraintHorizontal_bias="0.937"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.473" />
+        app:layout_constraintVertical_bias="0.736" />
+
+    <ImageView
+        android:id="@+id/imgtrack"
+        android:layout_width="85dp"
+        android:layout_height="86dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.049"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.272" />
 
     <View
         android:id="@+id/view"
@@ -60,18 +59,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
-
-    <ImageButton
-        android:id="@+id/track_down_by_playlist"
-        android:layout_width="53dp"
-        android:layout_height="48dp"
-        android:background="@drawable/btn_design"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/name_track_by_playlist"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.491"
-        app:srcCompat="@drawable/ic_baseline_download_24"
-        tools:ignore="SpeakableTextPresentCheck" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

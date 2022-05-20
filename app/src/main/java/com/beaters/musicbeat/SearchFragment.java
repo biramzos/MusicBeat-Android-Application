@@ -1,5 +1,6 @@
 package com.beaters.musicbeat;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -14,12 +16,16 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.beaters.musicbeat.Models.Track;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -76,7 +82,8 @@ public class SearchFragment extends Fragment implements RecyclerViewOnClickListe
                 requireActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(requireActivity(),"There is no track with  name!",Toast.LENGTH_SHORT).show();
+                        Toast toast = Toast.makeText(requireActivity(),"There is no track with  name!",Toast.LENGTH_SHORT);
+                        toast.show();
                     }
                 });
             }
@@ -104,13 +111,15 @@ public class SearchFragment extends Fragment implements RecyclerViewOnClickListe
                                         e.printStackTrace();
                                     }
                                 }
-                                SearchAdapter adapter = new SearchAdapter(getContext(),tracks, onClickListenner, getActivity());
+                                SearchAdapter adapter = new SearchAdapter(getContext(),tracks, onClickListenner);
                                 recycler.setLayoutManager(new LinearLayoutManager(getContext()));
                                 recycler.setAdapter(adapter);
                             }
                         });
                     } catch (JSONException e) {
-                        Toast.makeText(requireActivity(),"There is no track!",Toast.LENGTH_SHORT).show();
+                        System.out.println(e);
+                        Toast toast = Toast.makeText(requireActivity(),"There is no track with  name!",Toast.LENGTH_SHORT);
+                        toast.show();
                     }
                 }
             }
@@ -127,7 +136,7 @@ public class SearchFragment extends Fragment implements RecyclerViewOnClickListe
         if(finded.size() == 0){
             Toast.makeText(requireContext(),"Do not find " + search + " artist or track!",Toast.LENGTH_LONG).show();
         }
-        SearchAdapter adapter = new SearchAdapter(getContext(),finded, onClickListenner,getActivity());
+        SearchAdapter adapter = new SearchAdapter(getContext(),finded, onClickListenner);
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         recycler.setAdapter(adapter);
     }

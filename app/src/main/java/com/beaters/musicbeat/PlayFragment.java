@@ -11,16 +11,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.beaters.musicbeat.Authentication.Database;
 import com.bumptech.glide.Glide;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class PlayFragment extends Fragment {
@@ -129,7 +139,7 @@ public class PlayFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        if(player.isPlaying() || !(player.isPlaying())){
+        if(player.isPlaying()){
             player.pause();
             player = null;
         }

@@ -5,12 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import androidx.annotation.Nullable;
 
 public class Database extends SQLiteOpenHelper {
 
     private Context context;
-    private static final String DATABASE_NAME = "SavedUser.db";
+    private static final String DATABASE_NAME = "User.db";
     private static final int DATABASE_VERSION = 1;
 
     private static final String TABLE_NAME = "user";
@@ -39,7 +40,7 @@ public class Database extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public void add(String username, String email, String password){
+    public void add(Long id, String username, String email, String password){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_USERNAME, username);

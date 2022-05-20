@@ -21,6 +21,10 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+
+import com.bumptech.glide.Glide;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.File;
@@ -113,8 +117,8 @@ public class MicFragment extends Fragment {
                             requireActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    trackname.setText("Name: " + title);
-                                    trackauthor.setText("Author: " + artist);
+                                    trackname.setText(title);
+                                    trackauthor.setText(artist);
                                 }
                             });
                         }

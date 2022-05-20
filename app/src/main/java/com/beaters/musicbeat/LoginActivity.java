@@ -1,13 +1,16 @@
 package com.beaters.musicbeat;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import com.beaters.musicbeat.Authentication.Database;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
@@ -84,39 +87,27 @@ public class LoginActivity extends AppCompatActivity {
                     final String myResponse = Objects.requireNonNull(response.body()).string();
                     try {
                         JSONObject JsonData = new JSONObject(myResponse);
-                        if(JsonData.getString("message").equals("password or nickname incorrect")){
-                            LoginActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getApplicationContext(), "Email or password is incorrect!", Toast.LENGTH_SHORT).show();
+                        Long id = JsonData.getLong("id");
+                        String emailRes = JsonData.getString("email");
+                        String username = JsonData.getString("nickname");
+                        LoginActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(emailRes.equals(email)){
+                                    Intent data = new Intent(getApplicationContext(),MainActivity.class);
+                                    Database myDB = new Database(LoginActivity.this);
+                                    myDB.add(id,username, email, password);
+                                    data.putExtra("id",id);
+                                    data.putExtra("username",username);
+                                    data.putExtra("email",email);
+                                    data.putExtra("password",password);
+                                    startActivity(data);
                                 }
-                            });
-                        }
-                        else {
-                            Long id = JsonData.getLong("id");
-                            String emailRes = JsonData.getString("email");
-                            String username = JsonData.getString("nickname");
-                            String token = String.valueOf(JsonData.get("accessToken"));
-                            LoginActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (emailRes.equals(email)) {
-                                        Intent data = new Intent(getApplicationContext(), MainActivity.class);
-                                        Database myDB = new Database(LoginActivity.this);
-                                        myDB.add(username, email, password);
-                                        data.putExtra("id", id);
-                                        data.putExtra("accessToken",token);
-                                        data.putExtra("username", username);
-                                        data.putExtra("email", email);
-                                        data.putExtra("password", password);
-
-                                        startActivity(data);
-                                    } else {
-                                        Toast.makeText(getApplicationContext(), "Something wrong!", Toast.LENGTH_SHORT).show();
-                                    }
+                                else{
+                                    Toast.makeText(getApplicationContext(),"Something wrong!", Toast.LENGTH_SHORT).show();
                                 }
-                            });
-                        }
+                            }
+                        });
                     } catch (JSONException e) {
                         e.printStackTrace();
                         LoginActivity.this.runOnUiThread(new Runnable() {

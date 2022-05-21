@@ -1,13 +1,15 @@
 package com.beaters.musicbeat;
 
-import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Context;
-import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,11 +24,12 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
     ArrayList<Track> tracks;
     Context context;
-
-    public SearchAdapter(Context context, ArrayList<Track> tracks, RecyclerViewOnClickListenner onClickListenner){
+    Activity activity;
+    public SearchAdapter(Context context, ArrayList<Track> tracks, RecyclerViewOnClickListenner onClickListenner, Activity activity){
         this.context = context;
         this.tracks = tracks;
         this.onClickListenner = onClickListenner;
+        this.activity = activity;
     }
 
     @Override
@@ -48,6 +51,17 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         Glide.with(context).load(track.getImgUrl()).into(holder.imgTrack);
         holder.trackName.setText(track.getName());
         holder.trackAuthor.setText(track.getAuthor());
+        holder.download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DownloadManager manager = (DownloadManager) activity.getSystemService(Context.DOWNLOAD_SERVICE);
+                Uri uri = Uri.parse(track.getUrl());
+                DownloadManager.Request request = new DownloadManager.Request(uri);
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,track.getName() + ".mp3");
+                manager.enqueue(request);
+            }
+        });
     }
 
     @Override
@@ -59,12 +73,14 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
         TextView trackName, trackAuthor;
         ImageView imgTrack;
+        ImageButton download;
 
         public ViewHolder(@NonNull View itemView, RecyclerViewOnClickListenner onClickListenner) {
             super(itemView);
-            trackName = itemView.findViewById(R.id.name_track);
-            trackAuthor = itemView.findViewById(R.id.author_track);
-            imgTrack = itemView.findViewById(R.id.imgtrack);
+            trackName = itemView.findViewById(R.id.name_track_by_playlist);
+            trackAuthor = itemView.findViewById(R.id.author_track_by_playlist);
+            imgTrack = itemView.findViewById(R.id.img_track_by_playlist);
+            download = itemView.findViewById(R.id.track_down_by_playlist);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -15,13 +15,6 @@ public class Category {
         return id;
     }
 
-<<<<<<< HEAD
-=======
-    public void setId(Long id) {
-        this.id = id;
-    }
-
->>>>>>> origin/app
     public String getImg_url() {
         return img_url;
     }
@@ -30,17 +23,6 @@ public class Category {
         return title;
     }
 
-<<<<<<< HEAD
-=======
-    public void setImg_url(String img_url) {
-        this.img_url = img_url;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
->>>>>>> origin/app
     @Override
     public String toString() {
         return "Category{" +

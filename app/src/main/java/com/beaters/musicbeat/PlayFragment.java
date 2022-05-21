@@ -139,7 +139,7 @@ public class PlayFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        if(player.isPlaying()){
+        if(player.isPlaying() || !(player.isPlaying())){
             player.pause();
             player = null;
         }

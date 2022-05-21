@@ -40,7 +40,7 @@ public class Database extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    public void add(Long id, String username, String email, String password){
+    public void add(String username, String email, String password){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_USERNAME, username);

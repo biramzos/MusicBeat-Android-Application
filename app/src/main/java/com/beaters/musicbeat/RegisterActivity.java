@@ -39,11 +39,13 @@ public class RegisterActivity extends AppCompatActivity {
         if(cursor.getCount() == 0){
             ActivityActions();
         }else{
+            String email = null;
+            String password = null;
             while (cursor.moveToNext()) {
-                String email = cursor.getString(1);
-                String password = cursor.getString(2);
-                login(email, password);
+                email = cursor.getString(1);
+                password = cursor.getString(2);
             }
+            login(email, password);
         }
     }
 
@@ -98,8 +100,7 @@ public class RegisterActivity extends AppCompatActivity {
                 RegisterActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast toast = Toast.makeText(getApplicationContext(), "Something wrong!", Toast.LENGTH_SHORT);
-                        toast.show();
+                        Toast.makeText(getApplicationContext(), "Something wrong!", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -140,40 +141,6 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    public void logout(Long id){
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url("https://music-beats32.herokuapp.com/auth/logout?userId="+id)
-                .delete()
-                .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                e.printStackTrace();
-                RegisterActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast toast = Toast.makeText(RegisterActivity.this,"Error!",Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if(response.isSuccessful()){
-                    final String myResponse = Objects.requireNonNull(response.body()).string();
-                    RegisterActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            finishAndRemoveTask();
-                        }
-                    });
-                }
-            }
-        });
-    }
-
     public void login(String email, String password){
         OkHttpClient client = new OkHttpClient();
         MediaType type = MediaType.parse("application/json");
@@ -193,8 +160,12 @@ public class RegisterActivity extends AppCompatActivity {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                System.out.println(e);
-                Toast.makeText(getApplicationContext(),"Something wrong!", Toast.LENGTH_SHORT).show();
+                RegisterActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),"Something wrong!", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
             @Override
             public void onResponse(Call call, Response response) throws IOException {
@@ -202,25 +173,37 @@ public class RegisterActivity extends AppCompatActivity {
                     final String myResponse = Objects.requireNonNull(response.body()).string();
                     try {
                         JSONObject JsonData = new JSONObject(myResponse);
-                        Long id = JsonData.getLong("id");
-                        String emailRes = JsonData.getString("email");
-                        String username = JsonData.getString("nickname");
-                        RegisterActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if(emailRes.equals(email)){
-                                    Intent data = new Intent(getApplicationContext(),MainActivity.class);
-                                    data.putExtra("id",id);
-                                    data.putExtra("username",username);
-                                    data.putExtra("email",email);
-                                    data.putExtra("password",password);
-                                    startActivity(data);
+                        if(JsonData.getString("message").equals("password or nickname incorrect")){
+                            RegisterActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), "Email or password is incorrect!", Toast.LENGTH_SHORT).show();
                                 }
-                                else{
-                                    Toast.makeText(getApplicationContext(),"Something wrong!", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                        else {
+                            Long id = JsonData.getLong("id");
+                            String emailRes = JsonData.getString("email");
+                            String username = JsonData.getString("nickname");
+                            String token = String.valueOf(JsonData.get("accessToken"));
+                            RegisterActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (emailRes.equals(email)) {
+                                        Intent data = new Intent(getApplicationContext(), MainActivity.class);
+                                        data.putExtra("id", id);
+                                        data.putExtra("accessToken",token);
+                                        data.putExtra("username", username);
+                                        data.putExtra("email", email);
+                                        data.putExtra("password", password);
+
+                                        startActivity(data);
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "Something wrong!", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                         RegisterActivity.this.runOnUiThread(new Runnable() {

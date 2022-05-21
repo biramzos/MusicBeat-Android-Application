@@ -73,13 +73,14 @@
         app:srcCompat="@drawable/ic_baseline_download_24"
         tools:ignore="SpeakableTextPresentCheck" />
 
-    <ImageButton
+    <Button
         android:id="@+id/del_track_by_playlist"
-        android:layout_width="47dp"
-        android:layout_height="41dp"
-        android:background="@drawable/btn_design"
-        android:src="@drawable/ic_baseline_remove_24"
+        android:layout_width="55dp"
+        android:layout_height="46dp"
+        android:text="-"
         android:textAlignment="center"
+        android:textColor="#FF5722"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -129,4 +129,22 @@
         app:layout_constraintEnd_toStartOf="@+id/btn_go_reg"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <TextView
+        android:id="@+id/forgetpass"
+        android:layout_width="342dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="34dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="35dp"
+        android:layout_marginBottom="13dp"
+        android:text="Forget password? Click here! "
+        android:textAlignment="center"
+        android:textColor="#FF5722"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/btn_log"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/log_password" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

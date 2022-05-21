@@ -1,5 +1,4 @@
 package com.beaters.musicbeat;
-
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -9,17 +8,22 @@ import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.beaters.musicbeat.Models.Track;
 import com.bumptech.glide.Glide;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -47,6 +51,7 @@ public class TrackByPlaylistAdapter extends RecyclerView.Adapter<TrackByPlaylist
         return R.layout.playlist_track;
     }
 
+
     @NonNull
     @Override
     public PlaylistViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -58,6 +63,8 @@ public class TrackByPlaylistAdapter extends RecyclerView.Adapter<TrackByPlaylist
     @Override
     public void onBindViewHolder(@NonNull PlaylistViewHolder holder, int position) {
         Track track = tracks.get(position);
+        Long playlistId = arguments.getLong("playlistId");
+        String token = arguments.getString("accessToken");
         Glide.with(context).load(track.getImgUrl()).into(holder.imgTrack);
         holder.trackName.setText(track.getName());
         holder.trackAuthor.setText(track.getAuthor());
@@ -75,50 +82,41 @@ public class TrackByPlaylistAdapter extends RecyclerView.Adapter<TrackByPlaylist
         holder.remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Long playlistId = arguments.getLong("playlistId");
-                String token = arguments.getString("accessToken");
-                removeTrackFromPlaylist(track.getId(), playlistId, token);
-                activity.recreate();
-            }
-        });
-    }
-
-    public void removeTrackFromPlaylist(Long musicId, Long playlistId, String token){
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url("https://music-beats32.herokuapp.com/playlist/delete/music?musicId="+musicId+"&playlistId="+playlistId)
-                .delete()
-                .addHeader("Authorization", "Bearer " + token)
-                .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                e.printStackTrace();
-                activity.runOnUiThread(new Runnable() {
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url("https://music-beats32.herokuapp.com/playlist/delete/music?musicId="+track.getId()+"&playlistId="+playlistId)
+                        .delete()
+                        .addHeader("Authorization", "Bearer " + token)
+                        .build();
+                client.newCall(request).enqueue(new Callback() {
                     @Override
-                    public void run() {
-                        Toast toast = Toast.makeText(activity,"Error!",Toast.LENGTH_SHORT);
-                        toast.show();
+                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                        e.printStackTrace();
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(activity,"Error!",Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                    @Override
+                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                        if(response.isSuccessful()){
+                            final String myResponse = Objects.requireNonNull(response.body()).string();
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(myResponse.equals("Ваша музыка  была успешно удалена!")){
+                                        Toast.makeText(activity,"Successfully deleted!",Toast.LENGTH_SHORT).show();
+                                    }
+                                    else{
+                                        Toast.makeText(activity,"Mistake with delete music from playlist!",Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        }
                     }
                 });
-            }
-
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if(response.isSuccessful()){
-                    final String myResponse = Objects.requireNonNull(response.body()).string();
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(myResponse.equals("Ваша музыка  была успешно удалена!")){
-                                Toast.makeText(activity,"Successfully deleted!",Toast.LENGTH_SHORT).show();
-                            }
-                            else{
-                                Toast.makeText(activity,"Mistake with delete music from playlist!",Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-                }
             }
         });
     }
@@ -132,7 +130,8 @@ public class TrackByPlaylistAdapter extends RecyclerView.Adapter<TrackByPlaylist
 
         TextView trackName, trackAuthor;
         ImageView imgTrack;
-        ImageButton download, remove;
+        ImageButton download;
+        Button remove;
         public PlaylistViewHolder(@NonNull View itemView, RecyclerViewOnClickListenner onClickListenner) {
             super(itemView);
             trackName = itemView.findViewById(R.id.name_track_by_playlist);

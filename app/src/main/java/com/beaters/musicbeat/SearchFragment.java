@@ -82,8 +82,7 @@ public class SearchFragment extends Fragment implements RecyclerViewOnClickListe
                 requireActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast toast = Toast.makeText(requireActivity(),"There is no track with  name!",Toast.LENGTH_SHORT);
-                        toast.show();
+                        Toast.makeText(requireActivity(),"There is no track with  name!",Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -111,15 +110,13 @@ public class SearchFragment extends Fragment implements RecyclerViewOnClickListe
                                         e.printStackTrace();
                                     }
                                 }
-                                SearchAdapter adapter = new SearchAdapter(getContext(),tracks, onClickListenner);
+                                SearchAdapter adapter = new SearchAdapter(getContext(),tracks, onClickListenner, getActivity());
                                 recycler.setLayoutManager(new LinearLayoutManager(getContext()));
                                 recycler.setAdapter(adapter);
                             }
                         });
                     } catch (JSONException e) {
-                        System.out.println(e);
-                        Toast toast = Toast.makeText(requireActivity(),"There is no track with  name!",Toast.LENGTH_SHORT);
-                        toast.show();
+                        Toast.makeText(requireActivity(),"There is no track!",Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -136,7 +133,7 @@ public class SearchFragment extends Fragment implements RecyclerViewOnClickListe
         if(finded.size() == 0){
             Toast.makeText(requireContext(),"Do not find " + search + " artist or track!",Toast.LENGTH_LONG).show();
         }
-        SearchAdapter adapter = new SearchAdapter(getContext(),finded, onClickListenner);
+        SearchAdapter adapter = new SearchAdapter(getContext(),finded, onClickListenner,getActivity());
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         recycler.setAdapter(adapter);
     }

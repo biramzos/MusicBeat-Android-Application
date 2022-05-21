@@ -111,7 +111,6 @@ public class HomeFragment extends Fragment implements RecyclerViewOnClickListenn
     @Override
     public void onClick(int position) {
         Category category = categories.get(position);
-        System.out.println(category);
         FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
         Bundle data = new Bundle();
         Fragment fragment = new TrackByCategoryFragment();

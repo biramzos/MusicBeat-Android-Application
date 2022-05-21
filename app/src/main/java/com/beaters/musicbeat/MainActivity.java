@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
                     new HomeFragment()).commit();
         }
 
-        if(this.isFinishing()){
+        if(this.isFinishing() || this.isDestroyed()){
             Intent userData = getIntent();
             Long id = userData.getLongExtra("id",0);
             logout(id);
@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
                     data.putString("username", userData.getStringExtra("username"));
                     data.putString("email", userData.getStringExtra("email"));
                     data.putLong("id",userData.getLongExtra("id",0));
+                    data.putString("accessToken",userData.getStringExtra("accessToken"));
                     assert selectedFragment != null;
                     selectedFragment.setArguments(data);
                     transaction.replace(R.id.fragment,selectedFragment).addToBackStack(null).commit();
@@ -110,30 +111,12 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             Intent intent = new Intent(getApplicationContext(),RegisterActivity.class);
+                            MainActivity.this.finish();
                             startActivity(intent);
-                            MainActivity.this.finishAndRemoveTask();
                         }
                     });
                 }
             }
         });
-    }
-
-    @Override
-    protected void onDestroy() {
-        Intent userData = getIntent();
-        Long id = userData.getLongExtra("id",0);
-        logout(id);
-        System.out.println("OnDestroy");
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onStop() {
-        Intent userData = getIntent();
-        Long id = userData.getLongExtra("id",0);
-        logout(id);
-        System.out.println("OnStop");
-        super.onStop();
     }
 }

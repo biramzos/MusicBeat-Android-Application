@@ -3,10 +3,12 @@ package com.beaters.musicbeat;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beaters.musicbeat.Authentication.Database;
@@ -27,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
 
     EditText email,password;
     Button btn_log, btn_go_reg;
+    TextView forget;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +42,15 @@ public class LoginActivity extends AppCompatActivity {
         password = findViewById(R.id.log_password);
         btn_log = findViewById(R.id.btn_log);
         btn_go_reg = findViewById(R.id.btn_go_reg);
+        forget = findViewById(R.id.forgetpass);
+
+        forget.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://music-beat-front.herokuapp.com/signin"));
+                startActivity(intent);
+            }
+        });
 
         btn_log.setOnClickListener(
                 new View.OnClickListener() {
@@ -87,27 +99,39 @@ public class LoginActivity extends AppCompatActivity {
                     final String myResponse = Objects.requireNonNull(response.body()).string();
                     try {
                         JSONObject JsonData = new JSONObject(myResponse);
-                        Long id = JsonData.getLong("id");
-                        String emailRes = JsonData.getString("email");
-                        String username = JsonData.getString("nickname");
-                        LoginActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if(emailRes.equals(email)){
-                                    Intent data = new Intent(getApplicationContext(),MainActivity.class);
-                                    Database myDB = new Database(LoginActivity.this);
-                                    myDB.add(id,username, email, password);
-                                    data.putExtra("id",id);
-                                    data.putExtra("username",username);
-                                    data.putExtra("email",email);
-                                    data.putExtra("password",password);
-                                    startActivity(data);
+                        if(JsonData.getString("message").equals("password or nickname incorrect")){
+                            LoginActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), "Email or password is incorrect!", Toast.LENGTH_SHORT).show();
                                 }
-                                else{
-                                    Toast.makeText(getApplicationContext(),"Something wrong!", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                        else {
+                            Long id = JsonData.getLong("id");
+                            String emailRes = JsonData.getString("email");
+                            String username = JsonData.getString("nickname");
+                            String token = String.valueOf(JsonData.get("accessToken"));
+                            LoginActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (emailRes.equals(email)) {
+                                        Intent data = new Intent(getApplicationContext(), MainActivity.class);
+                                        Database myDB = new Database(LoginActivity.this);
+                                        myDB.add(username, email, password);
+                                        data.putExtra("id", id);
+                                        data.putExtra("accessToken",token);
+                                        data.putExtra("username", username);
+                                        data.putExtra("email", email);
+                                        data.putExtra("password", password);
+
+                                        startActivity(data);
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "Something wrong!", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                         LoginActivity.this.runOnUiThread(new Runnable() {

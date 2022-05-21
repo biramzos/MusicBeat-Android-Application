@@ -117,8 +117,8 @@ public class MicFragment extends Fragment {
                             requireActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    trackname.setText(title);
-                                    trackauthor.setText(artist);
+                                    trackname.setText("Name: " + title);
+                                    trackauthor.setText("Author: " + artist);
                                 }
                             });
                         }
